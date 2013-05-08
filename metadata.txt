@@ -1,7 +1,7 @@
 ; the next section is mandatory
 [general]
 name=PDOK BAG Geocoder
-qgisMinimumVersion=1.4
+qgisMinimumVersion=1.7
 description=QGIS plugin for finding Dutch XY coordinates from a CSV file with use of the BAG geocoder webservice from www.pdok.nl
 ; end of mandatory metadata
 
@@ -10,14 +10,11 @@ description=QGIS plugin for finding Dutch XY coordinates from a CSV file with us
 
 changelog:
     0.1.0   first publication on plugins.qgis.org
- 
 category=Vector
 version=2013.05.01
 author=Eelke Jager
 email=info@lytrix.com
-homepage=http://www.basisinformatie-amsterdam.nl
-repository=http://pyqgis.org/repo/contributed
-experimental=False
+experimental=True
 deprecated=False
 homepage:https://github.com/Lytrix/pdokbaggeocoder
 

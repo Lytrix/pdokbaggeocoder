@@ -205,7 +205,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer):
 
 		qgis.mainWindow().statusBar().showMessage("Geocoding " + unicode(recordcount) + 
 			" (" + unicode(notfoundcount) + " not found)")
-		time.sleep(1) # to avoid pdok.nl quota limits
+		time.sleep(1) # to avoid Google rate quota limits
 		address = ""
 		for x in indices:
 			if x < len(row):
@@ -221,24 +221,24 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer):
 			notwriter.writerow(row)
 	
 		else:
-			try:
-				url = "http://geodata.nationaalgeoregister.nl/geocoder/Geocoder?zoekterm=" + address
-				xml = urllib2.urlopen(url).read()
-				#get the first xml tag (<tag>data</tag>) that the parser finds with name gml:
-				dom = minidom.parse(urllib2.urlopen(url))
+	
+			url = "http://geodata.nationaalgeoregister.nl/geocoder/Geocoder?zoekterm=" + address
+			xml = urllib2.urlopen(url).read()
+			#get the first xml tag (<tag>data</tag>) that the parser finds with name gml:
+			dom = minidom.parse(urllib2.urlopen(url))
 
-				doc = parseString(xml)
-				if doc.getElementsByTagName('gml:pos'):
-					xmlTag = doc.getElementsByTagName('gml:pos')[0].firstChild.nodeValue								
-					# split X and Y coordinate in list
-					XY = xmlTag.split()
-					if XY:
-						x = float(XY[0])
-						y = float(XY[1])
-						print "%s" % x
-						print "%s" % y
-						# print address + ": " + str(x) + ", " + str(y)
-						attributes = {}
+			doc = parseString(xml)
+			if doc.getElementsByTagName('gml:pos'):
+				xmlTag = doc.getElementsByTagName('gml:pos')[0].firstChild.nodeValue								
+				# split X and Y coordinate in list
+				XY = xmlTag.split()
+				if XY:
+					x = float(XY[0])
+					y = float(XY[1])
+					print "%s" % x
+					print "%s" % y
+					# print address + ": " + str(x) + ", " + str(y)
+					attributes = {}
 					for z in range(0, len(header)):
 						if z < len(row):
 							attributes[z] = QVariant(row[z].strip())
@@ -247,13 +247,11 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer):
 					geometry = QgsGeometry.fromPoint(QgsPoint(x, y))
 					newfeature.setGeometry(geometry)
 					outfile.addFeature(newfeature)
-				else:
-					notfoundcount += 1
-					notwriter.writerow(row)
-					# print xml
-			except:
-				QMessageBox.critical(qgis.mainWindow(),"Geocoderen met PDOK BAG Geocoder" ,"Geocoderen mislukt. De geocodeer service van PDOK is momenteel niet bereikbaar. \n\nProbeer het later nog een keer of kijk voor de status van de storing bij de meldingen op www.pdok.nl.")
-				return None
+			else:
+				notfoundcount += 1
+				notwriter.writerow(row)
+				# print xml
+
 	del outfile
 	del notfound
 

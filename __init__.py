@@ -1,5 +1,5 @@
 # --------------------------------------------------------
-#    __init__ - PDOK BAG Geocoder init file
+#    __init__ - BAGadreszoeker init file
 #
 #    begin		          : 1 May 2013
 #    copyright            : (c) 2013 by Eelke Jager
@@ -40,7 +40,7 @@ def version():
 def icon():
 	return "icon.png"
 def qgisMinimumVersion():
-	return "1.8"
+	return "1.4"
 def author():
 	return "Eelke Jager"
 def email():

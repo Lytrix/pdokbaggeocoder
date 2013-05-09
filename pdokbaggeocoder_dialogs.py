@@ -136,6 +136,10 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 					self.housenumber_extension.setCurrentIndex(index + 1)
 				if field.lower() == "extension":
 					self.housenumber_extension.setCurrentIndex(index + 1)
+				if field.lower() == "huisltr":
+					self.housenumber_letter.setCurrentIndex(index + 1)
+				if field.lower() == "ltr":
+					self.housenumber_letter.setCurrentIndex(index + 1)
 				if field.lower() == "letter":
 					self.housenumber_letter.setCurrentIndex(index + 1)
 				if field.lower().find("city") >= 0:
@@ -219,24 +223,36 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 						self.city.setCurrentIndex(index + 1)
 					if field.lower().find("city") >= 0:
 						self.city.setCurrentIndex(index + 1)	
-					
+			
 	def run(self):
-		csvname = unicode(self.infilename.displayText()).strip()
-		shapefilename = unicode(self.shapefilename.displayText())
-		notfoundfile = self.notfoundfilename.displayText()
-
-		fields = [unicode(self.address.currentText()).strip(),
-			  unicode(self.city.currentText()).strip(),
-			  unicode(self.housenumber.currentText()).strip(),
-			  unicode(self.housenumber_extension.currentText()).strip(),
-			  unicode(self.housenumber_letter.currentText()).strip()]
-	
-		for x in range(0, len(fields)):
-			if fields[x] == "----":
-				fields[x] = ""
-
-		# print csvname + "," + "," + shapefilename
-		message = pdokbaggeocoder(self.iface, csvname, shapefilename, notfoundfile, fields, 1)
-		if message <> None:
-			QMessageBox.critical(self.iface.mainWindow(), "Geocode BAG", message)
+		# alert if no city is given
+		if self.city is None:
+			QMessageBox.critical(self.iface.mainWindow(), "PDOK BAG Geocoder", "Geen Woonplaats kolom ingevuld!") 		
+		else:
+			csvname = unicode(self.infilename.displayText()).strip()
+			shapefilename = unicode(self.shapefilename.displayText())
+			notfoundfile = self.notfoundfilename.displayText()
+			
+			# use - instead of + for extension and letter additions in search sentence
+			#if self.housenumber_extension or self.housenumber_letter:
+			#	dash="-"
+			#else:
+			#	dash=""
+			
+			if self.radio_list.isChecked():
+				# separate field for single cityname
+				current_city=unicode(self.city.currentText())
+				fields = [unicode(self.address.currentText()).strip(), unicode(self.housenumber.currentText()).strip()]
 		
+			if self.radio_column.isChecked():
+			# create address search line: address+housenumber-extension or letter+city	
+				fields = [unicode(self.address.currentText()).strip(), unicode(self.housenumber.currentText()).strip(),unicode(self.city.currentText()).strip()]
+		
+			for x in range(0, len(fields)):
+				if fields[x] == "----":
+					fields[x] = ""		
+	
+			# print csvname + "," + "," + shapefilename
+			message = pdokbaggeocoder(self.iface, csvname, shapefilename, notfoundfile, fields, 1, current_city)
+			if message <> None:
+				QMessageBox.critical(self.iface.mainWindow(), "Geocode BAG", message)	

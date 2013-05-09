@@ -80,10 +80,6 @@ def format_float(value, separator, decimals):
 	return string
 
 
-# baggeocoder_layer_attribute_bounds() is needed because the 
-# QgsVectorDataProvider::minimumValue() and maximumValue() 
-# do not work as of QGIS v1.5.0
-
 def pdokbaggeocoder_layer_attribute_bounds(layer, attribute_name):
 	#attribute_index = -1
 	#for index, field in layer.dataProvider().fields().iteritems():	
@@ -140,7 +136,10 @@ def pdokbaggeocoder_wkbtype_to_text(wkbtype):
 #    BAG_geocode_pdok - Geocode CSV points from Pdok
 # --------------------------------------------------------------
 
-def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer):
+def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,current_city):
+	global address_list
+	address_list=[]
+	
 	# Read the CSV file header
 	try:
 		infile = open(csvname, 'r')
@@ -152,9 +151,13 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer):
 	except:
 		return "Failure reading " + unicode(csvname) + ": " + unicode(sys.exc_info()[1])
 
-
+	
 	fields = {}
 	indices = []
+	
+	# if city selected from list then use this field
+	selected_city = "+%s" % unicode(current_city)
+	
 	try:
 		infile.seek(0)
 		reader = csv.reader(infile, dialect)
@@ -206,23 +209,25 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer):
 		qgis.mainWindow().statusBar().showMessage("Geocoding " + unicode(recordcount) + 
 			" (" + unicode(notfoundcount) + " not found)")
 		time.sleep(1) # to avoid pdok.nl quota limits
-		address = ""
+		total_address = ""
 		for x in indices:
 			if x < len(row):
 				# value = row[x].strip().replace(" ","+")
 				value = urllib.quote(row[x].strip())
 				if len(value) > 0:
 					if x != indices[0]:
-						address += "+"
-					address += value
+						total_address += "+"
+					total_address += value
 
-		if len(address) <= 0:
+		if len(total_address) <= 0:
 			notfoundcount += 1
 			notwriter.writerow(row)
 	
 		else:
 			try:
-				url = "http://geodata.nationaalgeoregister.nl/geocoder/Geocoder?zoekterm=" + address
+				url = "http://geodata.nationaalgeoregister.nl/geocoder/Geocoder?zoekterm=" + total_address + selected_city
+				
+				address_list.append(url)
 				xml = urllib2.urlopen(url).read()
 				#get the first xml tag (<tag>data</tag>) that the parser finds with name gml:
 				dom = minidom.parse(urllib2.urlopen(url))
@@ -263,5 +268,5 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer):
 	qgis.mainWindow().statusBar().showMessage(unicode(recordcount - notfoundcount) + " of " + unicode(recordcount)
 		+ " addresses geocoded with PDOK BAG Geocoder")
 	QMessageBox.information(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", unicode(recordcount - notfoundcount) + " of " + unicode(recordcount)
-		+ " adressen succesvol gegeocodeerd in EPSG:28992.\n\n Kijk in het onderstaande bestand:\n"+unicode(notfoundfile)+" \nvoor de niet gevonden locaties.\n_______________________________________________________\nAls er geen locaties gevonden zijn, controleer of het huisnummer bestaat, of het gebruik van ij of y, ck correct is volgens de BAG.\nOf gebruik, indien beschikbaar, de postcodes voor een globale plaatsbepaling van de locaties.")
+		+ " adressen succesvol gegeocodeerd in EPSG:28992.\n\n Kijk in het onderstaande bestand:\n"+unicode(notfoundfile)+" \nvoor de niet gevonden locaties.\n_______________________________________________________\nAls er geen locaties gevonden zijn, controleer of het huisnummer bestaat, of het gebruik van ij of y, ck correct is volgens de BAG.\nOf gebruik, indien beschikbaar, de postcodes voor een globale plaatsbepaling van de locaties.\n %s" % address_list) 
 	return None

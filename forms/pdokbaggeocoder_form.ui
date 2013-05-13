@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>baggeocoder_form</class>
- <widget class="QDialog" name="baggeocoder_form">
+ <class>pdokbaggeocoder_form</class>
+ <widget class="QDialog" name="pdokbaggeocoder_form">
   <property name="windowModality">
    <enum>Qt::ApplicationModal</enum>
   </property>
@@ -12,21 +12,21 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>440</width>
-    <height>450</height>
+    <width>476</width>
+    <height>348</height>
    </rect>
   </property>
   <property name="mouseTracking">
    <bool>false</bool>
   </property>
   <property name="windowTitle">
-   <string>Geocode with Google</string>
+   <string>PDOK BAG Geocoder</string>
   </property>
   <widget class="QDialogButtonBox" name="buttonBox">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>410</y>
+     <x>300</x>
+     <y>310</y>
      <width>160</width>
      <height>21</height>
     </rect>
@@ -38,74 +38,45 @@
     <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
    </property>
   </widget>
-  <widget class="QLabel" name="label_opslaan_als">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>300</y>
-     <width>141</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Opslaan als Shapefile:</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="shapefilename">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>320</y>
-     <width>321</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>geocoded.shp</string>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-  </widget>
   <widget class="QPushButton" name="browse_shapefile">
    <property name="geometry">
     <rect>
-     <x>340</x>
-     <y>320</y>
+     <x>380</x>
+     <y>270</y>
      <width>79</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Kies...</string>
+    <string>Save as...</string>
    </property>
   </widget>
-  <widget class="QComboBox" name="woonplaats">
+  <widget class="QComboBox" name="city">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>138</y>
+     <x>300</x>
+     <y>202</y>
      <width>161</width>
      <height>27</height>
     </rect>
    </property>
   </widget>
-  <widget class="QComboBox" name="adres">
+  <widget class="QComboBox" name="address">
    <property name="geometry">
     <rect>
-     <x>260</x>
-     <y>108</y>
+     <x>300</x>
+     <y>114</y>
      <width>161</width>
      <height>27</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="adres_label">
+  <widget class="QLabel" name="address_label">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>112</y>
-     <width>281</width>
+     <y>116</y>
+     <width>251</width>
      <height>20</height>
     </rect>
    </property>
@@ -116,10 +87,10 @@
     </font>
    </property>
    <property name="text">
-    <string>Adres (met huisnr) of Postcode</string>
+    <string>Adres (met huisnummer) of Postcode</string>
    </property>
   </widget>
-  <widget class="QLabel" name="selecteer_bestand_label">
+  <widget class="QLabel" name="label_select_file">
    <property name="geometry">
     <rect>
      <x>20</x>
@@ -137,7 +108,7 @@
     <rect>
      <x>20</x>
      <y>30</y>
-     <width>321</width>
+     <width>361</width>
      <height>21</height>
     </rect>
    </property>
@@ -151,154 +122,108 @@
   <widget class="QPushButton" name="browse_infile">
    <property name="geometry">
     <rect>
-     <x>340</x>
+     <x>380</x>
      <y>30</y>
      <width>79</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Kies...</string>
+    <string>Select...</string>
    </property>
   </widget>
-  <widget class="QLabel" name="label_niet_gevonden">
+  <widget class="QComboBox" name="housenumber">
    <property name="geometry">
     <rect>
-     <x>20</x>
-     <y>350</y>
-     <width>261</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Niet gevonden locaties CSV bestand:</string>
-   </property>
-  </widget>
-  <widget class="QLineEdit" name="notfoundfilename">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>370</y>
-     <width>321</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>niet_gevonden.csv</string>
-   </property>
-   <property name="readOnly">
-    <bool>false</bool>
-   </property>
-  </widget>
-  <widget class="QPushButton" name="browse_notfound">
-   <property name="geometry">
-    <rect>
-     <x>340</x>
-     <y>370</y>
-     <width>79</width>
-     <height>21</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Kies...</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="huisnummer">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>190</y>
+     <x>300</x>
+     <y>159</y>
      <width>161</width>
      <height>27</height>
     </rect>
    </property>
   </widget>
-  <widget class="QLabel" name="huisnummer_label">
+  <widget class="QLabel" name="housenumber_label">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>192</y>
-     <width>171</width>
+     <y>152</y>
+     <width>141</width>
      <height>22</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <weight>75</weight>
+     <bold>true</bold>
+    </font>
+   </property>
    <property name="text">
-    <string>Huisnummer (1,2,3,...)</string>
+    <string>Huisnummer</string>
    </property>
   </widget>
-  <widget class="QLabel" name="huisnummer_toevoeging_label">
+  <widget class="QLabel" name="label_add_column_selection">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>222</y>
-     <width>221</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Huisnummer toevoeging (H,1,2..)</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="huisnummer_toevoeging">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>220</y>
-     <width>161</width>
-     <height>27</height>
-    </rect>
-   </property>
-  </widget>
-  <widget class="QLabel" name="koppel_kolomvelden_label">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>80</y>
+     <y>84</y>
      <width>391</width>
      <height>16</height>
     </rect>
    </property>
    <property name="text">
-    <string>Koppel de kolomvelden voor de zoek query: </string>
+    <string>Koppel de kolomvelden uit het CSV bestand: </string>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radio_kolom">
+  <widget class="QRadioButton" name="radio_column">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>165</y>
-     <width>101</width>
+     <x>20</x>
+     <y>209</y>
+     <width>150</width>
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
    <property name="text">
-    <string>kies kolom</string>
+    <string>selecteer een kolom of</string>
+   </property>
+   <property name="checked">
+    <bool>true</bool>
    </property>
   </widget>
-  <widget class="QRadioButton" name="radio_lijst">
+  <widget class="QRadioButton" name="radio_list">
    <property name="geometry">
     <rect>
-     <x>110</x>
-     <y>142</y>
+     <x>156</x>
+     <y>209</y>
      <width>121</width>
      <height>20</height>
     </rect>
    </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+    </font>
+   </property>
    <property name="text">
-    <string>kies uit lijst</string>
+    <string>een woonplaats</string>
    </property>
    <property name="checked">
-    <bool>true</bool>
+    <bool>false</bool>
    </property>
    <property name="autoExclusive">
     <bool>true</bool>
    </property>
   </widget>
-  <widget class="QLabel" name="woonplaats_label">
+  <widget class="QLabel" name="city_label">
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>140</y>
+     <y>192</y>
      <width>91</width>
      <height>22</height>
     </rect>
@@ -313,35 +238,12 @@
     <string>Woonplaats</string>
    </property>
   </widget>
-  <widget class="QLabel" name="huisnummer_letter_label">
-   <property name="geometry">
-    <rect>
-     <x>20</x>
-     <y>252</y>
-     <width>171</width>
-     <height>22</height>
-    </rect>
-   </property>
-   <property name="text">
-    <string>Huisnummer letter (A-Z)</string>
-   </property>
-  </widget>
-  <widget class="QComboBox" name="huisnummer_letter">
-   <property name="geometry">
-    <rect>
-     <x>260</x>
-     <y>250</y>
-     <width>161</width>
-     <height>27</height>
-    </rect>
-   </property>
-  </widget>
   <widget class="Line" name="line">
    <property name="geometry">
     <rect>
      <x>20</x>
      <y>60</y>
-     <width>401</width>
+     <width>441</width>
      <height>16</height>
     </rect>
    </property>
@@ -353,13 +255,140 @@
    <property name="geometry">
     <rect>
      <x>20</x>
-     <y>286</y>
-     <width>401</width>
+     <y>240</y>
+     <width>441</width>
      <height>16</height>
     </rect>
    </property>
    <property name="orientation">
     <enum>Qt::Horizontal</enum>
+   </property>
+  </widget>
+  <widget class="QLabel" name="address_sublabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>127</y>
+     <width>261</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>huisnummertoevoegingen worden genegeerd</string>
+   </property>
+  </widget>
+  <widget class="QLabel" name="housenumber_sublabel">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>163</y>
+     <width>261</width>
+     <height>30</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>10</pointsize>
+     <weight>50</weight>
+     <bold>false</bold>
+    </font>
+   </property>
+   <property name="text">
+    <string>optioneel, als huisnummers apart staan</string>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="shapefilename">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>270</y>
+     <width>361</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="readOnly">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QToolButton" name="help_button">
+   <property name="geometry">
+    <rect>
+     <x>20</x>
+     <y>310</y>
+     <width>81</width>
+     <height>21</height>
+    </rect>
+   </property>
+   <property name="font">
+    <font>
+     <pointsize>13</pointsize>
+    </font>
+   </property>
+   <property name="text">
+    <string>Help</string>
+   </property>
+   <property name="toolButtonStyle">
+    <enum>Qt::ToolButtonTextOnly</enum>
+   </property>
+  </widget>
+  <widget class="QLineEdit" name="notfoundfilename">
+   <property name="enabled">
+    <bool>true</bool>
+   </property>
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>0</width>
+     <height>0</height>
+    </rect>
+   </property>
+   <property name="sizePolicy">
+    <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+     <horstretch>0</horstretch>
+     <verstretch>0</verstretch>
+    </sizepolicy>
+   </property>
+   <property name="maximumSize">
+    <size>
+     <width>0</width>
+     <height>0</height>
+    </size>
+   </property>
+   <property name="text">
+    <string/>
+   </property>
+   <property name="maxLength">
+    <number>1024</number>
+   </property>
+   <property name="frame">
+    <bool>true</bool>
+   </property>
+   <property name="readOnly">
+    <bool>false</bool>
+   </property>
+  </widget>
+  <widget class="QPushButton" name="browse_notfound">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>0</width>
+     <height>0</height>
+    </rect>
+   </property>
+   <property name="text">
+    <string/>
    </property>
   </widget>
  </widget>
@@ -368,7 +397,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>accepted()</signal>
-   <receiver>baggeocoder_form</receiver>
+   <receiver>pdokbaggeocoder_form</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
@@ -384,7 +413,7 @@
   <connection>
    <sender>buttonBox</sender>
    <signal>rejected()</signal>
-   <receiver>baggeocoder_form</receiver>
+   <receiver>pdokbaggeocoder_form</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">

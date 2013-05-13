@@ -36,7 +36,7 @@ def name():
 def description():
 	return "Get X,Y coordinates in EPSG:28992 with the PDOK geocoding webservice"
 def version():
-	return "2013.05.09"
+	return "0.2"
 def icon():
 	return "icon.png"
 def qgisMinimumVersion():

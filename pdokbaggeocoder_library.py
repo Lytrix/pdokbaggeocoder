@@ -160,6 +160,8 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 	housenumber_list = []
 	global selected_city_list
 	selected_city_list = []
+	global tester
+	tester = []
 	
 	# Read the CSV file header
 	try:
@@ -181,7 +183,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 		selected_city = "+" + urllib.quote(current_city)
 		selected_city_list.append(selected_city)
 	else:
-		selected_city="bla"
+		selected_city=""
 	
 	try:
 		infile.seek(0)
@@ -243,31 +245,37 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 				#value = row[x].strip().replace(" ","+")
 				#value = urllib.quote(row[x].strip()
 				
-				# put (house)numbers in seperate list
-				separate_numbers=[n for n in value.split() if n.isdigit()]
-				#separate_numbers_list.append(separate_numbers)
-				# put a-z words in another
-				#only_text = [a for a in value.split() if a.isalpha()]
-				
-				# put all words in a list
-				total_text = [i for i in value.split() if not i.isdigit()]
-				
-				# list with to be removed listed items
-				letter_extensions = ['HS','H','I','II','III','IV','V','VI','VII','VIII','IX','X','A','B','C','D','E','F','G',',',':']
-				# list with removed items
-				
-				separate_text = [t for t in total_text if t not in letter_extensions]
-				# join words back together with space
-				only_text = ' '.join(separate_text)
-				
-				# if numbers are present select only first one
-				if separate_numbers:
-					housenumber_selection= separate_numbers[0]
-					#housenumber_list.append(housenumber_selection) 
+				pc_turn = [p for p in row if row[x][0:3].isdigit()]
+				#tester.append(pc_turn)
+				if pc_turn != []:
+					new_string = value.replace(' ','')	
 				else:
-					housenumber_selection=""
-				# join name and number (if street name is present)
-				new_string = urllib.quote(only_text) + housenumber_selection
+					# put (house)numbers in seperate list
+					separate_numbers=[n for n in value.split() if n.isdigit()]
+					#separate_numbers_list.append(separate_numbers)
+					# put a-z words in another
+					#only_text = [a for a in value.split() if a.isalpha()]
+					
+					# put all words in a list
+					total_text = [i for i in value.split() if not i.isdigit()]
+					
+					# list with to be removed listed items
+					letter_extensions = ['HS','H','I','II','III','IV','V','VI','VII','VIII','IX','X','A','B','C','D','E','F','G',',',':']
+					# list with removed items
+				
+					separate_text = [t for t in total_text if t not in letter_extensions]
+				
+					# join words back together with space
+					only_text = ' '.join(separate_text)
+				
+					# if numbers are present select only first one
+					if separate_numbers:
+						housenumber_selection= "+" + separate_numbers[0]
+						#housenumber_list.append(housenumber_selection) 
+					else:
+						housenumber_selection=""
+					# join name and number (if street name is present)
+					new_string = urllib.quote(only_text) + housenumber_selection
 				
 								
 				if len(new_string) > 0:
@@ -276,10 +284,10 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 					total_address += new_string
 					
 				# checks of listed outputs in message box	
-				value_list.append(value)
-				separate_numbers_list.append(separate_numbers)
-				onlytext_list.append(separate_text)
-				address_list.append(new_string)
+				#value_list.append(value)
+				#separate_numbers_list.append(separate_numbers)
+				#onlytext_list.append(separate_text)
+				#address_list.append(new_string)
 				
 		if len(total_address) <= 0:
 			notfoundcount += 1
@@ -355,5 +363,5 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 	
 	qgis.mainWindow().statusBar().showMessage(unicode(recordcount - notfoundcount) + " of " + unicode(recordcount)
 		+ " addresses geocoded with PDOK BAG Geocoder")
-	QMessageBox.information(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", "%s van %s adressen succesvol gegeocodeerd in %s (in EPSG:28992) \n%s" % ((unicode(recordcount - notfoundcount)),(unicode(recordcount)), str(datetime.timedelta(seconds=elapsed_time)),tips))
+	QMessageBox.information(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", "%s van %s adressen succesvol gegeocodeerd in %s %s(in EPSG:28992) \n%s" % ((unicode(recordcount - notfoundcount)),(unicode(recordcount)), str(datetime.timedelta(seconds=elapsed_time)),tips))
 	return None

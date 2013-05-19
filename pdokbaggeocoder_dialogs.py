@@ -65,7 +65,7 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 		QtCore.QObject.connect(self.radio_column,QtCore.SIGNAL("toggled(bool)"), self.radio_activateInput)
 		self.radio_column.setChecked(True)
 		QObject.connect(self.browse_shapefile, SIGNAL("clicked()"), self.browse_shapefile_dialog)
-		QObject.connect(self.help_button, SIGNAL("clicked()"), self.open_help)
+		#QObject.connect(self.help_button, SIGNAL("clicked()"), self.open_help)
 		QObject.connect(self.browse_notfound, SIGNAL("clicked()"), self.browse_notfound_dialog)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.run)
 		self.distinct

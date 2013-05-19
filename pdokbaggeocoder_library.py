@@ -363,5 +363,5 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 	
 	qgis.mainWindow().statusBar().showMessage(unicode(recordcount - notfoundcount) + " of " + unicode(recordcount)
 		+ " addresses geocoded with PDOK BAG Geocoder")
-	QMessageBox.information(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", "%s van %s adressen succesvol gegeocodeerd in %s %s(in EPSG:28992) \n%s" % ((unicode(recordcount - notfoundcount)),(unicode(recordcount)), str(datetime.timedelta(seconds=elapsed_time)),tips))
+	QMessageBox.information(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", "%s van %s adressen succesvol gegeocodeerd in %s (in EPSG:28992) \n%s" % ((unicode(recordcount - notfoundcount)),(unicode(recordcount)), str(datetime.timedelta(seconds=elapsed_time)),tips))
 	return None

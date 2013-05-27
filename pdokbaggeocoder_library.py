@@ -33,6 +33,7 @@ import re
 import codecs
 #from re import sub
 
+
 from xml.dom import minidom
 from xml.dom.minidom import parseString
 from PyQt4.QtCore import *
@@ -170,7 +171,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 		return "Fout bij het openen van " + csvname
 
 	try:
-		dialect = csv.Sniffer().sniff(infile.readline(), [',',';',';','|'])
+		dialect = csv.Sniffer().sniff(infile.readline(), [',',';',';','|'],)
 	except:
 		return "Fout bij het openen van " + unicode(csvname) + ": " + unicode(sys.exc_info()[1])
 
@@ -210,7 +211,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 	except:
 		return "Failure opening " +notfoundfile
 
-	notwriter = csv.writer(notfound, dialect)
+	notwriter = csv.writer(notfound, dialect=csv.excel)
 	notwriter.writerow(header)
 
 
@@ -292,7 +293,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 		if len(total_address) <= 0:
 			notfoundcount += 1
 			notwriter.writerow(row)
-			address_list.append(new_string)
+			
 		else:
 			try:
 				url = "http://geodata.nationaalgeoregister.nl/geocoder/Geocoder?zoekterm=" + total_address + selected_city
@@ -301,12 +302,10 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 				url_list.append(url)
 				try:
 					xml = urllib2.urlopen(url).read()
-				
-					#dom = minidom.parse(urllib2.urlopen(url))
-					#get the first xml tag (<tag>data</tag>) that the parser finds with name gml:
 					doc = parseString(xml)
-					if doc.getElementsByTagName('gml:pos'):
-						xmlTag = doc.getElementsByTagName('gml:pos')[0].firstChild.nodeValue								
+					xmlTag = doc.getElementsByTagName('gml:pos')[0].firstChild.nodeValue								
+					# if total_address is correctly written xmlTag exists:
+					if xmlTag:	
 						# split X and Y coordinate in list
 						XY = xmlTag.split()
 						if XY:
@@ -324,25 +323,16 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 						geometry = QgsGeometry.fromPoint(QgsPoint(x, y))
 						newfeature.setGeometry(geometry)
 						outfile.addFeature(newfeature)
-					else:
-						notfoundcount += 1
-						notwriter.writerow(row)
-						notfound_list.append(url)
-						# print xml
-				# no valid xml request
 				except:
 					notfoundcount += 1
 					notwriter.writerow(row)
 					notfound_list.append(url)
-					# print xml	
-			# website offline
+			# website offline?
 			except:
 				end_time = time.time()
-
 				elapsed_time = round(end_time - start_time)
-
 				QMessageBox.critical(qgis.mainWindow(),"Geocoderen met PDOK BAG Geocoder" ,"Geocoderen mislukt na %s aantal en %s. \n%s" % (unicode(recordcount),str(datetime.timedelta(seconds=elapsed_time)),unicode(url_list[-1])))
-				return
+	#			return
 	del outfile
 	del notfound
 	

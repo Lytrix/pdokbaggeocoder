@@ -1,4 +1,4 @@
-# --------------------------------------------------------
+ # --------------------------------------------------------
 #    __init__ - BAG geocoder init file
 #
 #    creation date        : 1 May 2013
@@ -23,34 +23,37 @@
 from PyQt4.QtCore import *
 from PyQt4.QtGui import *
 from qgis.core import *
-
-from pdokbaggeocoder_dialogs import *
-
+from pdokbaggeocoder_dialogs import pdokbaggeocoder_dialog
+import os.path
 # ---------------------------------------------
 
 class pdokbaggeocoder_menu:
+
 	def __init__(self, iface):
+		# Save reference to the QGIS interface
 		self.iface = iface
+		# Create the dialog (after translation) and keep reference
+		self.dlg = pdokbaggeocoder_dialog(iface)
 
 	def initGui(self):
-  		# Create action
-    		icon = QIcon(os.path.dirname(__file__) + "/icon.png")
-    		self.action = QAction(QIcon(icon),"PDOK BAG Geocoder",self.iface.mainWindow())
-    		self.action.setWhatsThis("BAG geocoder with the PDOK webservice")
-    		QObject.connect(self.action,SIGNAL("triggered()"),self.run)
-    		self.iface.addToolBarIcon(self.action)
-    		self.iface.addPluginToMenu("&PDOK Bag Geocoder",self.action)
-    		# self.about = QAction("About ImportProject",self.iface.mainWindow())
-    		#QObject.connect(self.about,SIGNAL("triggered()"),self.clickAbout)
-    		#self.iface.addPluginToMenu("&BagGeocoder",self.about)
-
-
-  	def unload(self):
-	# Remove the plugin
-		self.iface.removePluginMenu("&PDOK Bag Geocoder",self.action)
+		icon = QIcon(os.path.dirname(__file__) + "/icon.png")
+		self.action = QAction(icon, "PDOK BAG Geocoder", self.iface.mainWindow())
+		self.action.triggered.connect(self.run)
+		# Add toolbar button and menu item
+		self.iface.addToolBarIcon(self.action)
+		self.iface.addPluginToMenu(u"&PDOK BAG Geocoder", self.action)
+		
+	def unload(self):
+		# Remove the plugin menu item and icon
+		self.iface.removePluginMenu(u"&PDOK BAG Geocoder", self.action)
 		self.iface.removeToolBarIcon(self.action)
-
-  	def run(self):
-		dialog = pdokbaggeocoder_dialog(self.iface)
-		dialog.exec_()
-
+		  
+	# run method that performs all the real work	
+	def run(self):
+		# show the dialog
+		self.dlg.show()
+		# Run the dialog event loop
+		result = self.dlg.exec_()
+		# See if OK was pressed
+		if result == 1:
+			pass

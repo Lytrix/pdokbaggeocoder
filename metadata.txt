@@ -1,14 +1,15 @@
 [general]
 name=PDOK BAG Geocoder
-qgisMinimumVersion=1.8
+qgisMinimumVersion=2.0
 description=QGIS plugin for finding Dutch XY coordinates from a CSV file with use of the BAG geocoder webservice from www.pdok.nl
 changelog:
     0.1.0  First publication on plugins.qgis.org.
     0.2.0  Better geocoding preparation/cleanup, error and result messaging and simplified UI.
     0.3.0  Better Postal code readout and removed macosx folder in zip
-    0.3.1  Fixed exiting geocoder on wrongly spelled city names. It now writes correctly to the not_found.csv
+    0.4.0  Fixed exiting geocoder on wrongly spelled city names. It now writes correctly to the not_found.csv
+    0.5.0  Reworked the code for running in 2.0
 category=Vector
-version=0.3.1
+version=0.4.0
 author=Eelke Jager
 email=info@lytrix.com
 experimental=True

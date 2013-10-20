@@ -58,8 +58,9 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 			
 	def __init__(self, iface):
 		QDialog.__init__(self)
-		self.iface = iface
 		self.setupUi(self)
+		self.iface = iface
+		
 		QObject.connect(self.browse_infile, SIGNAL("clicked()"), self.browse_infile_dialog)
 		QtCore.QObject.connect(self.radio_list,QtCore.SIGNAL("toggled(bool)"), self.radio_activateInput)
 		QtCore.QObject.connect(self.radio_column,QtCore.SIGNAL("toggled(bool)"), self.radio_activateInput)
@@ -76,10 +77,11 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 	def open_help(self):
 		dir = QFileInfo(core.QgsApplication.qgisUserDbFilePath()).path() + "/python/plugins/pdokbaggeocoder"
 		webbrowser.open(dir + "README.txt")
-	
+
+
 	def browse_infile_dialog(self):
-		newname = QFileDialog.getOpenFileName(None, QString.fromLocal8Bit("Address CSV Input File"), 
-			self.infilename.displayText(), "*.csv")
+		newname = QFileDialog.getOpenFileName(None, "Address CSV Input File", 
+			self.infilename.displayText(), "CSV File (*.csv *.txt)")
 		if newname:
 			try:
 				infile = open(newname, 'r')
@@ -111,12 +113,12 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 			combolist = [self.address, self.housenumber, self.city]
 			for box in combolist:
 				box.clear()
-				box.addItem(QString("----"))
+				box.addItem("----")
 				box.setCurrentIndex(0)	
 			for index in range(0, len(header)):
 				field = header[index]
 				for box in combolist:	
-					box.addItem(QString(field))
+					box.addItem((field))
 				# preselect value if name is found
 				if field.lower().find("adres") >= 0:
 					self.address.setCurrentIndex(index + 1)
@@ -150,7 +152,7 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 				if field.lower().find("woonplaats") >= 0:
 					self.radio_column.setChecked(True)
 					self.city.setCurrentIndex(index + 1)	
-				self.infilename.setText(QString(newname))
+				self.infilename.setText(newname)
 			
 			# store header names for self.city usage		
 			def save_column_list(input):
@@ -163,16 +165,16 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 			stored = save_column_list(header)
 			
 	def browse_notfound_dialog(self):
-		newname = QFileDialog.getSaveFileName(None, QString.fromLocal8Bit("Not Found List Output File"), 
-			self.notfoundfilename.displayText(), "*.csv")
+		newname = QFileDialog.getSaveFileName(None, "Not Found List Output File", 
+			self.notfoundfilename.displayText(), "CSV File (*.csv *.txt)")
                 if newname != None:
-                	self.notfoundfilename.setText(QString(newname))
+                	self.notfoundfilename.setText(newname)
 
 	def browse_shapefile_dialog(self):
-		newname = QFileDialog.getSaveFileName(None, QString.fromLocal8Bit("Output Shapefile"), 
+		newname = QFileDialog.getSaveFileName(None, "Output Shapefile", 
 			self.shapefilename.displayText(), "*.shp")
                 if newname != None:
-                	self.shapefilename.setText(QString(newname))
+                	self.shapefilename.setText(newname)
 	
 	# distinct function to cleanup city csv file
 	def distinct(self,list):	
@@ -206,12 +208,12 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 			# if storage is filled
 			if stored != '':
 				# add headers and a ---- option, start with ----			
-				self.city.addItem(QString("----"))
+				self.city.addItem("----")
 				self.city.setCurrentIndex(0)	
 				
 				for index in range(0, len(stored)):
 					field = stored[index]
-					self.city.addItem(QString(field))
+					self.city.addItem(field)
 					# preselect value if name is found
 					if field.lower().find("city") >= 0:
 						self.city.setCurrentIndex(index + 1)

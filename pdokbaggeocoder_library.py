@@ -85,7 +85,6 @@ def format_float(value, separator, decimals):
 
 	return string
 
-
 def pdokbaggeocoder_layer_attribute_bounds(layer, attribute_name):
 	#attribute_index = -1
 	#for index, field in layer.dataProvider().fields().iteritems():	
@@ -135,7 +134,8 @@ def pdokbaggeocoder_wkbtype_to_text(wkbtype):
 	if wkbtype == QGis.WKBMultiPolygon25D: return "multipolygon 2.5D"
 	return "Unknown WKB " + unicode(wkbtype)
 
-
+def pdokbaggeocoder_status_message(qgis, message):
+	qgis.mainWindow().statusBar().showMessage(message)
 
 
 # --------------------------------------------------------------
@@ -163,7 +163,8 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 	selected_city_list = []
 	global tester
 	tester = []
-	
+	if (not csvname) or (len(csvname) <= 0):
+		return "No CSV address file given"	
 	# Read the CSV file header
 	try:
 		infile = open(csvname, 'r')
@@ -173,12 +174,11 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 	try:
 		dialect = csv.Sniffer().sniff(infile.readline(), [',',';',';','|'],)
 	except:
-		return "Fout bij het openen van " + unicode(csvname) + ": " + unicode(sys.exc_info()[1])
+		return "Fout bij het openen van " + unicode(csvname) + ": " + unicode(sys.exc_info()[1]) + "Controleer of de scheidingstekens consistent zijn gekozen en deze niet in de velden voorkomen."
 
 	
-	fields = {}
+	fields = QgsFields()
 	indices = []
-	
 	# if city selected from list then use this field
 	if current_city != "":
 		selected_city = "+" + urllib.quote(current_city)
@@ -191,7 +191,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 		reader = csv.reader(infile, dialect)
 		header = reader.next()
 	except:
-		return "Failure reading " + unicode(csvname) + ": " + unicode(sys.exc_info()[1])
+		return "Fout bij het lezen van " + unicode(csvname) + ": " + unicode(sys.exc_info()[1])
 
 	for x in range(0, len(header)):
 		for y in range(0, len(keys)):
@@ -199,17 +199,17 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 				indices.append(x)
 
 		fieldname = header[x].strip()
-		fields[len(fields)] = QgsField(fieldname[0:9], QVariant.String)
+		fields.append(QgsField(fieldname[0:9], QVariant.String))
 
 	if (len(fields) <= 0) or (len(indices) <= 0):
-		return "No valid location fields in " + csvname
+		return "Geen geldige adresvelden in " + csvname
 
 
 	# Create the CSV file for ungeocoded records
 	try:
 		notfound = open(notfoundfile, 'w')
 	except:
-		return "Failure opening " +notfoundfile
+		return "Kan het bestand %s niet openen." % notfoundfile
 
 	notwriter = csv.writer(notfound, dialect=csv.excel)
 	notwriter.writerow(header)
@@ -217,15 +217,15 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 
 	# Create the output shapefile
 	if QFile(shapefilename).exists():
-		if not QgsVectorFileWriter.deleteShapeFile(QString(shapefilename)):
-			return "Failure deleting existing shapefile: " + unicode(shapefilename)
+		if not QgsVectorFileWriter.deleteShapeFile(shapefilename):
+			return "Kan shapefile: " + unicode(shapefilename) + "niet openen."
 
 	crs = QgsCoordinateReferenceSystem()
 	crs.createFromSrid(28992)
-	outfile = QgsVectorFileWriter(QString(shapefilename), QString("System"), fields, QGis.WKBPoint, crs)
+	outfile = QgsVectorFileWriter(shapefilename, "System", fields, QGis.WKBPoint, crs)
 
 	if (outfile.hasError() != QgsVectorFileWriter.NoError):
-		return "Failure creating output shapefile: " + unicode(outfile.errorMessage())
+		return "Schrijffout bij het aanmaken van de shapefile: " + unicode(outfile.errorMessage())
 
 	# Geocode and import
 
@@ -233,10 +233,8 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 	notfoundcount = 0
 	for row in reader:
 		recordcount += 1	
-
-		qgis.mainWindow().statusBar().showMessage("Geocoding " + unicode(recordcount) + 
-			" (" + unicode(notfoundcount) + " not found)")
-		
+		pdokbaggeocoder_status_message(qgis, "Geocoding " + unicode(recordcount) + 
+			" (" + unicode(notfoundcount) + " not found)")		
 		#time.sleep(1) # to avoid pdok.nl quota limits
 		total_address = ""
 		
@@ -303,9 +301,10 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 				try:
 					xml = urllib2.urlopen(url).read()
 					doc = parseString(xml)
-					xmlTag = doc.getElementsByTagName('gml:pos')[0].firstChild.nodeValue								
+					xmlTag = doc.getElementsByTagName("gml:pos")[0].firstChild.nodeValue								
 					# if total_address is correctly written xmlTag exists:
 					if xmlTag:	
+						remark=True
 						# split X and Y coordinate in list
 						XY = xmlTag.split()
 						if XY:
@@ -314,12 +313,13 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
 							print "%s" % x
 							print "%s" % y
 							# print address + ": " + str(x) + ", " + str(y)
-							attributes = {}
+						attributes = []
 						for z in range(0, len(header)):
 							if z < len(row):
-								attributes[z] = QVariant(row[z].strip())
+								attributes.append(unicode(row[z], 'utf-8').strip())
+
 						newfeature = QgsFeature()
-						newfeature.setAttributeMap(attributes)
+						newfeature.setAttributes(attributes)
 						geometry = QgsGeometry.fromPoint(QgsPoint(x, y))
 						newfeature.setGeometry(geometry)
 						outfile.addFeature(newfeature)

@@ -1,10 +1,10 @@
 PDOK BAG geocoder
 =================
 .. image:: https://img.shields.io/badge/python-2.7-blue.svg
-:target: https://www.python.org/
+   :target: https://www.python.org/
 
 .. image:: https://img.shields.io/badge/license-MPLv2.0-blue.svg
-:target: https://www.mozilla.org/en-US/MPL/2.0/
+   :target: https://www.mozilla.org/en-US/MPL/2.0/
 
 
 PDOK BAG geocoder is a QGIS plugin for finding Dutch XY coordinates from a CSV file with addresses with use of the National BAG geocoder webservice.

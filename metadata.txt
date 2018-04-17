@@ -8,8 +8,9 @@ changelog:
     0.3.0  Better Postal code readout and removed macosx folder in zip
     0.4.0  Fixed exiting geocoder on wrongly spelled city names. It now writes correctly to the not_found.csv
     0.5.0  Reworked the code for running in 2.0
+    0.6.0  Hotfix to work with the new geocoder
 category=Vector
-version=0.4.0
+version=0.6.0
 author=Eelke Jager
 email=info@lytrix.com
 experimental=True

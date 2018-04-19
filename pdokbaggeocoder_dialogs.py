@@ -60,14 +60,14 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 		QDialog.__init__(self)
 		self.setupUi(self)
 		self.iface = iface
-		
+                self.notfoundfilename.hide()
 		QObject.connect(self.browse_infile, SIGNAL("clicked()"), self.browse_infile_dialog)
 		QtCore.QObject.connect(self.radio_list,QtCore.SIGNAL("toggled(bool)"), self.radio_activateInput)
 		QtCore.QObject.connect(self.radio_column,QtCore.SIGNAL("toggled(bool)"), self.radio_activateInput)
 		self.radio_column.setChecked(True)
 		QObject.connect(self.browse_shapefile, SIGNAL("clicked()"), self.browse_shapefile_dialog)
 		#QObject.connect(self.help_button, SIGNAL("clicked()"), self.open_help)
-		QObject.connect(self.browse_notfound, SIGNAL("clicked()"), self.browse_notfound_dialog)
+		#QObject.connect(self.browse_notfound, SIGNAL("clicked()"), self.browse_notfound_dialog)
 		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.run)
 		self.distinct
 		global stored

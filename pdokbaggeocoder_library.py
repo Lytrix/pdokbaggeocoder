@@ -297,15 +297,15 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
                 url_geocoder = 'http://geodata.nationaalgeoregister.nl/locatieserver/free?q='
                 
                 #query_string = item["Adres_opgeschoond"]+' '+item["Woonplaats"]
-                print('requesting: {}{}'.format(url_geocoder, total_address))
+                #print('requesting: {}{}'.format(url_geocoder, total_address))
                 url = url_geocoder + total_address+'&rows=2'
                 url_list.append(url)
                 response = urllib2.urlopen(url).read()
                 result = json.loads(response)
-                print(result)
+                #print(result)
                 try:
                     resultBAG = result["response"]["docs"][0]
-                    print(resultBAG)
+                    #print(resultBAG)
                     # split X and Y coordinate in list
                     #QMessageBox.critical(qgis.mainWindow(),"Geocoderen met PDOK BAG Geocoder" ,str(item))
                     if resultBAG["centroide_rd"]:

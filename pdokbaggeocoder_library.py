@@ -5,20 +5,22 @@
 #    copyright            : (c) 2013 by Eelke Jager
 #    e-Mail               : info [at] lytrix.com
 #
-#   This plugin is based on framework of the 
-#   MMQGIS Geocode CSV with Google plugin created by Michael Minn. 
+#   This plugin is based on framework of the
+#   MMQGIS Geocode CSV with Google plugin created by Michael Minn.
 #   Go to http://plugins.qgis.org/plugins/mmqgis/ for more information.
-#   
+#
 #   The geocoding is provided by the www.pdok.nl geocoding webservice:
-#   Go to https://www.pdok.nl/nl/service/openls-bag-geocodeerservice 
+#   Go to https://www.pdok.nl/nl/service/openls-bag-geocodeerservice
 #   for more information.
 #
 #   The BAG geocoder is free software and is offered without guarantee
-#   or warranty. You can redistribute it and/or modify it 
-#   under the terms of version 2 of the GNU General Public 
-#   License (GPL v2) as published by the Free Software 
+#   or warranty. You can redistribute it and/or modify it
+#   under the terms of version 2 of the GNU General Public
+#   License (GPL v2) as published by the Free Software
 #   Foundation (www.gnu.org).
 # --------------------------------------------------------
+
+# utf-8
 
 import csv
 import sys
@@ -26,12 +28,9 @@ import time
 import datetime
 import urllib
 import os.path
-import operator
-import tempfile
 import urllib2
 import json
 import re
-import codecs
 #from re import sub
 
 from PyQt4.QtCore import *
@@ -44,6 +43,7 @@ import os
 #    BAG geocoder Functions
 # --------------------------------------------------------
 
+
 def pdokbaggeocoder_find_layer(layer_name):
     # print "find_layer(" + str(layer_name) + ")"
 
@@ -53,6 +53,7 @@ def pdokbaggeocoder_find_layer(layer_name):
 
     return None
 
+
 def pdokbaggeocoder_is_float(s):
     try:
         float(s)
@@ -60,9 +61,11 @@ def pdokbaggeocoder_is_float(s):
     except:
         return False
 
-# Cumbersome function to give backward compatibility before python 2.7
 
 def format_float(value, separator, decimals):
+    """
+        Cumbersome function to give backward compatibility before python 2.7
+    """
     formatstring = ("%0." + unicode(int(decimals)) + "f")
     # print str(value) + ": " + formatstring
     string = formatstring % value
@@ -83,9 +86,10 @@ def format_float(value, separator, decimals):
 
     return string
 
+
 def pdokbaggeocoder_layer_attribute_bounds(layer, attribute_name):
     #attribute_index = -1
-    #for index, field in layer.dataProvider().fields().iteritems(): 
+    #for index, field in layer.dataProvider().fields().iteritems():
     #   if str(field.name()) == attribute_name:
     #       attribute_index = index
 
@@ -113,7 +117,8 @@ def pdokbaggeocoder_layer_attribute_bounds(layer, attribute_name):
         # print str(value) + " : " + str(valid) + " : " + str(minimum) + " : " + str(maximum)
         count += 1
 
-    return minimum, maximum, 1 
+    return minimum, maximum, 1
+
 
 def pdokbaggeocoder_wkbtype_to_text(wkbtype):
     if wkbtype == QGis.WKBUnknown: return "Unknown"
@@ -132,6 +137,7 @@ def pdokbaggeocoder_wkbtype_to_text(wkbtype):
     if wkbtype == QGis.WKBMultiPolygon25D: return "multipolygon 2.5D"
     return "Unknown WKB " + unicode(wkbtype)
 
+
 def pdokbaggeocoder_status_message(qgis, message):
     qgis.mainWindow().statusBar().showMessage(message)
 
@@ -141,55 +147,34 @@ def pdokbaggeocoder_status_message(qgis, message):
 # --------------------------------------------------------------
 
 
-def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,current_city, start_time):
-    # test value to test all printed weblinks
-    global address_list
-    address_list=[]
-    global value_list
-    value_list = []
-    global separate_numbers_list
-    separate_numbers_list = []
-    global onlytext_list
-    onlytext_list = []
-    global url_list
-    url_list = []
-    global notfound_list
-    notfound_list = []
-    global housenumber_list
-    housenumber_list = []
-    global selected_city_list
-    selected_city_list = []
-    global tester
-    tester = []
+def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, current_city, start_time):
     if (not csvname) or (len(csvname) <= 0):
-        return "No CSV address file given"  
+        return "No CSV address file given"
     # Read the CSV file header
     try:
         infile = open(csvname, 'r')
-    except:
+    except EnvironmentError:
         return "Fout bij het openen van " + csvname
 
     try:
-        dialect = csv.Sniffer().sniff(infile.readline(), [',',';',';','|'],)
+        dialect = csv.Sniffer().sniff(infile.readline(), [',', ';', ';', '|'],)
     except:
-        return "Fout bij het openen van " + unicode(csvname) + ": " + unicode(sys.exc_info()[1]) + "Controleer of de scheidingstekens consistent zijn gekozen en deze niet in de velden voorkomen."
+        return "Fout bij het openen van " + str(csvname) + ": " + str(sys.exc_info()[1]) + "Controleer of de scheidingstekens consistent zijn gekozen en deze niet in de velden voorkomen."
 
-    
     fields = QgsFields()
     indices = []
-    # if city selected from list then use this field
+
     if current_city != "":
         selected_city = "+" + urllib.quote(current_city)
-        selected_city_list.append(selected_city)
     else:
-        selected_city=""
-    
+        selected_city = ""
+
     try:
         infile.seek(0)
         reader = csv.reader(infile, dialect)
         header = reader.next()
     except:
-        return "Fout bij het lezen van " + unicode(csvname) + ": " + unicode(sys.exc_info()[1])
+        return "Fout bij het lezen van " + str(csvname) + ": " + str(sys.exc_info()[1])
 
     for x in range(0, len(header)):
         for y in range(0, len(keys)):
@@ -202,7 +187,6 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
     if (len(fields) <= 0) or (len(indices) <= 0):
         return "Geen geldige adresvelden in " + csvname
 
-
     # Create the CSV file for ungeocoded records
     try:
         notfound = open(notfoundfile, 'w')
@@ -212,147 +196,118 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer,c
     notwriter = csv.writer(notfound, dialect=csv.excel)
     notwriter.writerow(header)
 
-
     # Create the output shapefile
     if QFile(shapefilename).exists():
         if not QgsVectorFileWriter.deleteShapeFile(shapefilename):
-            return "Kan shapefile: " + unicode(shapefilename) + "niet openen."
+            return "Kan shapefile: " + str(shapefilename) + "niet openen."
 
     crs = QgsCoordinateReferenceSystem()
     crs.createFromSrid(28992)
     outfile = QgsVectorFileWriter(shapefilename, "System", fields, QGis.WKBPoint, crs)
 
     if (outfile.hasError() != QgsVectorFileWriter.NoError):
-        return "Schrijffout bij het aanmaken van de shapefile: " + unicode(outfile.errorMessage())
+        return "Schrijffout bij het aanmaken van de shapefile: " + str(outfile.errorMessage())
 
     # Geocode and import
-
     recordcount = 0
     notfoundcount = 0
+    url_list = []
+    notfound_list = []
     for row in reader:
-        recordcount += 1    
-        pdokbaggeocoder_status_message(qgis, "Geocoding " + unicode(recordcount) + 
-            " (" + unicode(notfoundcount) + " not found)")      
-        #time.sleep(1) # to avoid pdok.nl quota limits
+        recordcount += 1
+        pdokbaggeocoder_status_message(qgis, "Geocoding " + str(recordcount) + " (" + str(notfoundcount) + " not found)")
         total_address = ""
-        
         for x in indices:
             if x < len(row):
-                value = row[x].strip().replace('-',' ')
+                value = row[x].strip()
+                value = row[x].replace('-', ' ')
                 #value = row[x].strip().replace(" ","+")
                 #value = urllib.quote(row[x].strip()
-                
-                pc_turn = [p for p in row if row[x][0:3].isdigit()]
+
+                pc_turn = [p for p in row if row[x][0:4].isdigit()]
                 #tester.append(pc_turn)
                 if pc_turn != []:
-                    new_string = value.replace(' ','')  
+                    new_string = value.replace(' ','')
+                    new_string = urllib.quote(new_string)
                 else:
                     # put (house)numbers in seperate list
-                    separate_numbers=[n for n in value.split() if n.isdigit()]
-                    #separate_numbers_list.append(separate_numbers)
-                    # put a-z words in another
-                    #only_text = [a for a in value.split() if a.isalpha()]
-                    
+                    separate_numbers = [n for n in value.split() if n.isdigit()]
                     # put all words in a list
                     total_text = [i for i in value.split() if not i.isdigit()]
-                    
+
                     # list with to be removed listed items
-                    letter_extensions = ['HS','H','I','II','III','IV','V','VI','VII','VIII','IX','X','A','B','C','D','E','F','G',',',':']
+                    letter_extensions = ['HS', 'H', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII','IX','X','A','B','C','D','E','F','G',',',':']
                     # list with removed items
-                
                     separate_text = [t for t in total_text if t not in letter_extensions]
-                
+
                     # join words back together with space
                     only_text = ' '.join(separate_text)
-                
+
                     # if numbers are present select only first one
                     if separate_numbers:
-                        housenumber_selection= "+" + separate_numbers[0]
-                        #housenumber_list.append(housenumber_selection) 
+                        housenumber_selection = "+" + separate_numbers[0]
                     else:
-                        housenumber_selection=""
+                        housenumber_selection = ""
                     # join name and number (if street name is present)
                     new_string = urllib.quote(only_text) + housenumber_selection
-                
-                                
+
                 if len(new_string) > 0:
-                    if x != indices[0]: 
+                    if x != indices[0]:
                         total_address += "+"
                     total_address += new_string
-                    
-                # checks of listed outputs in message box   
-                #value_list.append(value)
-                #separate_numbers_list.append(separate_numbers)
-                #onlytext_list.append(separate_text)
-                #address_list.append(new_string)
-                
+
         if len(total_address) <= 0:
             notfoundcount += 1
             notwriter.writerow(row)
-            
         else:
+            url_geocoder = 'http://geodata.nationaalgeoregister.nl/locatieserver/free?q='
+            url = '{}{}{}&rows=2'.format(url_geocoder,total_address, selected_city)
+            url_list.append(url)
             try:
-                item = {}
-            
-                url_geocoder = 'http://geodata.nationaalgeoregister.nl/locatieserver/free?q='
-                
-                #query_string = item["Adres_opgeschoond"]+' '+item["Woonplaats"]
-                #print('requesting: {}{}'.format(url_geocoder, total_address))
-                url = url_geocoder + total_address+'&rows=2'
-                url_list.append(url)
                 response = urllib2.urlopen(url).read()
                 result = json.loads(response)
-                #print(result)
-                try:
+                if len(result["response"]["docs"]) > 0:
                     resultBAG = result["response"]["docs"][0]
-                    #print(resultBAG)
-                    # split X and Y coordinate in list
-                    #QMessageBox.critical(qgis.mainWindow(),"Geocoderen met PDOK BAG Geocoder" ,str(item))
                     if resultBAG["centroide_rd"]:
-                        xy = re.findall(r'\d+\.*\d*',resultBAG["centroide_rd"])
+                        xy = re.findall(r'\d+\.*\d*', resultBAG["centroide_rd"])
                         #QMessageBox.critical(qgis.mainWindow(),"Geocoderen met PDOK BAG Geocoder" ,str(xy))
                         x = float(xy[0])
                         y = float(xy[1])
-                        #QMessageBox.critical(qgis.mainWindow(),"Geocoderen met PDOK BAG Geocoder" ,str(x))
                         attributes = []
                         for z in range(0, len(header)):
                             if z < len(row):
-                                attributes.append(unicode(row[z], 'utf-8').strip())
-
+                                attributes.append(row[z].strip())
                         newfeature = QgsFeature()
                         newfeature.setAttributes(attributes)
                         geometry = QgsGeometry.fromPoint(QgsPoint(x, y))
                         newfeature.setGeometry(geometry)
                         outfile.addFeature(newfeature)
-                except:
+                else:
                     notfoundcount += 1
                     notwriter.writerow(row)
                     notfound_list.append(url)
             # website offline?
-            except:
+            except urllib2.URLError as e:
                 end_time = time.time()
                 elapsed_time = round(end_time - start_time)
-                QMessageBox.critical(qgis.mainWindow(),"Geocoderen met PDOK BAG Geocoder" ,"Geocoderen mislukt na %s aantal en %s. \n%s" % (unicode(recordcount),str(datetime.timedelta(seconds=elapsed_time)),unicode(url_list[-1])))
-    #           return
+                QMessageBox.critical(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", "Geocoderen mislukt na %s aantal en %s. \n%s \nError\n%s" % (str(recordcount),str(datetime.timedelta(seconds=elapsed_time)),str(url_list[-1]), str(e)))
     del outfile
     del notfound
-    
 
     end_time = time.time()
 
     elapsed_time = round(end_time - start_time)
-        
+
     if addlayer and (recordcount > notfoundcount) and (recordcount > 0):
         vlayer = qgis.addVectorLayer(shapefilename, os.path.basename(shapefilename), "ogr")
-    
+
     if notfoundcount != 0:
-        tips = "\n____________________________________________________________\n\nNiet gevonden locaties:\n" + '\n'.join(map(str, notfound_list[0:])) + "\n\nDe niet gevonden rijen zijn op de volgende locatie opgeslagen:\n" + unicode(notfoundfile) + "\n"
-        
+        tips = "\n____________________________________________________________\n\nNiet gevonden locaties:\n" + '\n'.join(map(str, notfound_list[0:])) + "\n\nDe niet gevonden rijen zijn op de volgende locatie opgeslagen:\n" + str(notfoundfile) + "\n"
+
     else:
         tips=   "\n____________________________________________________________\n\nHieronder zijn de eerste paar gebruikte adressen te zien:\n"+'\n'.join(map(str, url_list[0:5]))+"\n..."
 
-    
     qgis.mainWindow().statusBar().showMessage(unicode(recordcount - notfoundcount) + " of " + unicode(recordcount)
         + " addresses geocoded with PDOK BAG Geocoder")
-    QMessageBox.information(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", "%s van %s adressen succesvol gegeocodeerd in %s (in EPSG:28992) \n%s" % ((unicode(recordcount - notfoundcount)),(unicode(recordcount)), str(datetime.timedelta(seconds=elapsed_time)),tips))
+    QMessageBox.information(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", "%s van %s adressen succesvol gegeocodeerd in %s (in EPSG:28992) \n%s" % ((str(recordcount - notfoundcount)),(str(recordcount)), str(datetime.timedelta(seconds=elapsed_time)),tips))
     return None

@@ -10,7 +10,7 @@
 #   Go to http://plugins.qgis.org/plugins/mmqgis/ for more information.
 #
 #   The geocoding is provided by the www.pdok.nl geocoding webservice:
-#   Go to https://www.pdok.nl/nl/service/openls-bag-geocodeerservice
+#   Go to https://github.com/PDOK/locatieserver/wiki/API-Locatieserver
 #   for more information.
 #
 #   The BAG geocoder is free software and is offered without guarantee
@@ -221,35 +221,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
             if x < len(row):
                 value = row[x].strip()
                 value = row[x].replace('-', ' ')
-                #value = row[x].strip().replace(" ","+")
-                #value = urllib.quote(row[x].strip()
-
-                pc_turn = [p for p in row if row[x][0:4].isdigit()]
-                #tester.append(pc_turn)
-                if pc_turn != []:
-                    new_string = value.replace(' ','')
-                    new_string = urllib.quote(new_string)
-                else:
-                    # put (house)numbers in seperate list
-                    separate_numbers = [n for n in value.split() if n.isdigit()]
-                    # put all words in a list
-                    total_text = [i for i in value.split() if not i.isdigit()]
-
-                    # list with to be removed listed items
-                    letter_extensions = ['HS', 'H', 'I', 'II', 'III', 'IV', 'V', 'VI', 'VII', 'VIII','IX','X','A','B','C','D','E','F','G',',',':']
-                    # list with removed items
-                    separate_text = [t for t in total_text if t not in letter_extensions]
-
-                    # join words back together with space
-                    only_text = ' '.join(separate_text)
-
-                    # if numbers are present select only first one
-                    if separate_numbers:
-                        housenumber_selection = "+" + separate_numbers[0]
-                    else:
-                        housenumber_selection = ""
-                    # join name and number (if street name is present)
-                    new_string = urllib.quote(only_text) + housenumber_selection
+                new_string = urllib.quote(value)
 
                 if len(new_string) > 0:
                     if x != indices[0]:
@@ -261,27 +233,27 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
             notwriter.writerow(row)
         else:
             url_geocoder = 'http://geodata.nationaalgeoregister.nl/locatieserver/free?q='
-            url = '{}{}{}&rows=2'.format(url_geocoder,total_address, selected_city)
+            url = '{}{}{}&rows=10&bq=type:adres'.format(url_geocoder,total_address, selected_city)
             url_list.append(url)
             try:
                 response = urllib2.urlopen(url).read()
-                result = json.loads(response)
-                if len(result["response"]["docs"]) > 0:
-                    resultBAG = result["response"]["docs"][0]
-                    if resultBAG["centroide_rd"]:
-                        xy = re.findall(r'\d+\.*\d*', resultBAG["centroide_rd"])
-                        #QMessageBox.critical(qgis.mainWindow(),"Geocoderen met PDOK BAG Geocoder" ,str(xy))
-                        x = float(xy[0])
-                        y = float(xy[1])
-                        attributes = []
-                        for z in range(0, len(header)):
-                            if z < len(row):
-                                attributes.append(row[z].strip())
-                        newfeature = QgsFeature()
-                        newfeature.setAttributes(attributes)
-                        geometry = QgsGeometry.fromPoint(QgsPoint(x, y))
-                        newfeature.setGeometry(geometry)
-                        outfile.addFeature(newfeature)
+                results = json.loads(response)
+                if len(results["response"]["docs"]) > 0:
+                    for result in results["response"]["docs"]:
+                        if result["score"] == results["response"]["maxScore"]:
+                            xy = re.findall(r'\d+\.*\d*', result["centroide_rd"])
+                            x = float(xy[0])
+                            y = float(xy[1])
+                            attributes = []
+                            for z in range(0, len(header)):
+                                if z < len(row):
+                                    attributes.append(row[z].strip())
+                            newfeature = QgsFeature()
+                            newfeature.setAttributes(attributes)
+                            geometry = QgsGeometry.fromPoint(QgsPoint(x, y))
+                            newfeature.setGeometry(geometry)
+                            outfile.addFeature(newfeature)
+                            break
                 else:
                     notfoundcount += 1
                     notwriter.writerow(row)

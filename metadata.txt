@@ -5,6 +5,7 @@ qgisMaximumVersion=2.99
 description=QGIS plugin for finding Dutch XY coordinates from a CSV file with use of the BAG geocoder webservice from www.pdok.nl
 about=QGIS plugin for finding Dutch XY coordinates from a CSV file with use of the BAG geocoder webservice from www.pdok.nl
 changelog:
+    0.6.4  fixed not selecting type:adres. Cause by higher scoring type weg instead of adres
     0.6.3  message statements in strings and url encode fields to fix http 400 errors
     0.6.2  Removed python 3.0 print syntax. Causing error in windows
     0.6.1  Resizable window, removed redundant code in UI and removed *.pyc files
@@ -15,7 +16,7 @@ changelog:
     0.2.0  Better geocoding preparation/cleanup, error/result messaging and simplified UI. 
     0.1.0  First publication on plugins.qgis.org.
 category=Vector
-version=0.6.3
+version=0.6.4
 author=Eelke Jager
 email=info@lytrix.com
 experimental=True

@@ -1,6 +1,6 @@
 PDOK BAG Excel to CSV coordinate finder
 =======================================
-.. image:: https://img.shields.io/badge/python-2.7-blue.svg
+.. image:: https://img.shields.io/badge/python-3.6-blue.svg
    :target: https://www.python.org/
 
 .. image:: https://img.shields.io/badge/license-MPLv2.0-blue.svg

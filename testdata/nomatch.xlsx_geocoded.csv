@@ -1,0 +1,9 @@
+title,adres,huisnummer,postcode,stad,Woonplaats,Postcode BAG,Straatnaam BAG,Huisnummer BAG,Woonplaats BAG,wkt_latlon,wkt_rd,lat,lon,nummeraanduiding_id,Matching
+niks gevonden,oliebollie,,,amsterdam,,,,,Amsterdam,POINT(4.90454379 52.37344272),POINT(122131.364 487394.738),4.90454379,52.37344272,,"Alleen woonplaats gevonden, coordinaat is centrum van de stad"
+nog 1,,,,,,,,,,POINT(0 0),POINT(0 0),0,0,,Onvoldoende locatie gegevens om een locatie te vinden
+straat match,dam,,,amsterdam,,,,,Amsterdam,POINT(4.89304914 52.372973),POINT(121348.243 487347.752),4.89304914,52.372973,,"Alleen woonplaats gevonden, coordinaat is centrum van de stad"
+postcode,,,1057DR,amsterdam,,,Postjeskade,,Amsterdam,POINT(4.85244012 52.36375263),POINT(118575.25 486341.5),4.85244012,52.36375263,,"Geen bekend huisnummer, coordinaat is middelpunt van straat"
+geen huisnummer bekend,postjeskade,99,1057DR,amsterdam,,,Postjeskade,,Amsterdam,POINT(4.85244012 52.36375263),POINT(118575.25 486341.5),4.85244012,52.36375263,,"Geen bekend huisnummer, coordinaat is middelpunt van straat"
+huisnummer bekend,postjeskade,6,1057DR,amsterdam,,1057DR,Postjeskade,6-H,Amsterdam,POINT(4.85239246 52.36374792),POINT(118572 486341),4.85239246,52.36374792,0363200000239747,Match gevonden
+postcode+huisnr,,4,1057DR,amsterdam,,1057DR,Postjeskade,4-H,Amsterdam,POINT(4.85249512 52.36375737),POINT(118579 486342),4.85249512,52.36375737,0363200000239739,Match gevonden
+alleen stad,,,,amsterdam,,,,,Amsterdam,POINT(4.90454379 52.37344272),POINT(122131.364 487394.738),4.90454379,52.37344272,,"Alleen woonplaats gevonden, coordinaat is centrum van de stad"

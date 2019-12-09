@@ -1,13 +1,15 @@
 PDOK BAG geocoder
 =================
-.. image:: https://img.shields.io/badge/python-2.7-blue.svg
+.. image:: https://img.shields.io/badge/python-3.7-blue.svg
    :target: https://www.python.org/
 
 .. image:: https://img.shields.io/badge/license-MPLv2.0-blue.svg
    :target: https://www.mozilla.org/en-US/MPL/2.0/
 
 
-PDOK BAG geocoder is a QGIS plugin for finding Dutch XY coordinates from a CSV file with addresses with use of the National BAG geocoder webservice.
+PDOK BAG geocoder is a QGIS v3 plugin for finding Dutch XY coordinates from a CSV file with addresses with use of the National BAG geocoder webservice. 
+
+For QGIS v2 versions, use the `qgis2 branch <https://github.com/Lytrix/pdokbaggeocoder/tree/qgis2branch>`_.
 
 Usage
 =====
@@ -33,6 +35,7 @@ Go to https://www.pdok.nl/nl/producten/pdok-locatieserver for more information.
 
 The csv file of cities list cities who are participating with the BAG transition. Go to http://www.kadaster.nl/web/Themas/themaartikel/BAGartikel/BAG-woonplaatscodetabel.htm for the source file.
 
+Thanks to `Richard Duivenvoorde <https://github.com/rduivenvoorde>`_ who helped making this plugin working again for QGIS3!
 
 Issues
 ======

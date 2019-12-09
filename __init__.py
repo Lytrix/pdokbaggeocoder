@@ -21,29 +21,10 @@
  This script initializes the plugin, making it known to QGIS.
 """
 
-
 def name():
 	return "PDOK BAG Geocoder"
 
-def description():
-	return "Get X,Y coordinates in EPSG:28992 with the PDOK geocoding webservice"
-
-def version():
-	return "Version 0.5"
-
-def icon():
-	return "icon.png"
-
-def qgisMinimumVersion():
-	return "2.0"
-
-def author():
-	return "Lytrix"
-
-def email():
-	return "info@lytrix.com"
-
 def classFactory(iface):
 	# load pdokbaggeocoder class from file pdokbaggeocoder
-	from pdokbaggeocoder_menu import pdokbaggeocoder_menu
+	from .pdokbaggeocoder_menu import pdokbaggeocoder_menu
 	return pdokbaggeocoder_menu(iface)

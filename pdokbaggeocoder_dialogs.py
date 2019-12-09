@@ -33,11 +33,12 @@ import os.path
 import operator
 import webbrowser
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtWidgets import QAction, QDialog, QFileDialog, QMessageBox
 from qgis.core import *
 from qgis import core
-from pdokbaggeocoder_library import *
+from .pdokbaggeocoder_library import *
 
 import sys
 sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms")
@@ -48,7 +49,7 @@ sys.path.append(os.path.dirname(os.path.abspath(__file__)) + "/forms")
 #    pdokbaggeocoder - Geocode using BAG data from PDOK
 # --------------------------------------------------------
 
-from pdokbaggeocoder_form import *
+from .forms.pdokbaggeocoder_form import *
 
 class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 	
@@ -60,15 +61,20 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 		QDialog.__init__(self)
 		self.setupUi(self)
 		self.iface = iface
-                self.notfoundfilename.hide()
-		QObject.connect(self.browse_infile, SIGNAL("clicked()"), self.browse_infile_dialog)
-		QtCore.QObject.connect(self.radio_list,QtCore.SIGNAL("toggled(bool)"), self.radio_activateInput)
-		QtCore.QObject.connect(self.radio_column,QtCore.SIGNAL("toggled(bool)"), self.radio_activateInput)
+		self.notfoundfilename.hide()
+#		QObject.connect(self.browse_infile, QtCore.SIGNAL("clicked()"), self.browse_infile_dialog)
+		self.browse_infile.clicked.connect(self.browse_infile_dialog)
+#		QtCore.QObject.connect(self.radio_list, QtCore.SIGNAL("toggled(bool)"), self.radio_activateInput)
+		self.radio_list.toggled.connect(self.radio_activateInput)
+#		QtCore.QObject.connect(self.radio_column, QtCore.SIGNAL("toggled(bool)"), self.radio_activateInput)
+		self.radio_column.toggled.connect(self.radio_activateInput)
 		self.radio_column.setChecked(True)
-		QObject.connect(self.browse_shapefile, SIGNAL("clicked()"), self.browse_shapefile_dialog)
+#		QObject.connect(self.browse_shapefile, QtCore.SIGNAL("clicked()"), self.browse_shapefile_dialog)
+		self.browse_shapefile.clicked.connect(self.browse_shapefile_dialog)
 		#QObject.connect(self.help_button, SIGNAL("clicked()"), self.open_help)
 		#QObject.connect(self.browse_notfound, SIGNAL("clicked()"), self.browse_notfound_dialog)
-		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.run)
+#		QtCore.QObject.connect(self.buttonBox, QtCore.SIGNAL("accepted()"), self.run)
+		self.buttonBox.accepted.connect(self.run)
 		self.distinct
 		global stored
 		stored = ''
@@ -80,15 +86,17 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 
 
 	def browse_infile_dialog(self):
-		newname = QFileDialog.getOpenFileName(None, "Address CSV Input File", 
-			self.infilename.displayText(), "CSV File (*.csv *.txt)")
+		newname = QFileDialog.getOpenFileName(None, "Address CSV Input File", self.infilename.displayText(), "CSV File (*.csv *.txt)")
+		# ?? QFileDialog.getOpenFileName returns a tuple in which the first item is the filename+path
+		if newname and newname[0]:
+			newname = newname[0]
 		if newname:
 			try:
-				infile = open(newname, 'r')
+				infile = open(newname, encoding="latin-1")
 				dialect = csv.Sniffer().sniff(infile.readline(), [',',';',';','|'])
 			except:
 				QMessageBox.critical(self.iface.mainWindow(), "Geocoderen met PDOK BAG Geocoder", \
-					newname + " inaccessible or in unrecognized CSV format: " + unicode(sys.exc_info()[1]))
+					newname + " inaccessible or in unrecognized CSV format: " + str(sys.exc_info()[1]))
 				return
 
 			if len(newname) > 4:
@@ -102,10 +110,13 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 			infile.seek(0)
 			try:
 				reader = csv.reader(infile, dialect)
-				header = reader.next()
+				print('**********************')
+				print(reader)
+				print('**********************')
+				header = reader.__next__()
 			except:
 				QMessageBox.critical(self.iface.mainWindow(), "Geocoderen met PDOK BAG Geocoder", \
-					newname + " inaccessible or in unrecognized CSV format: " + unicode(sys.exc_info()[1]))
+					newname + " inaccessible or in unrecognized CSV format: " + str(sys.exc_info()[1]))
 				return
 
 			del reader
@@ -165,16 +176,14 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 			stored = save_column_list(header)
 			
 	def browse_notfound_dialog(self):
-		newname = QFileDialog.getSaveFileName(None, "Not Found List Output File", 
-			self.notfoundfilename.displayText(), "CSV File (*.csv *.txt)")
-                if newname != None:
-                	self.notfoundfilename.setText(newname)
+		newname = QFileDialog.getSaveFileName(None, "Not Found List Output File",  self.notfoundfilename.displayText(), "CSV File (*.csv *.txt)")
+		if newname != None:
+			self.notfoundfilename.setText(newname)
 
 	def browse_shapefile_dialog(self):
-		newname = QFileDialog.getSaveFileName(None, "Output Shapefile", 
-			self.shapefilename.displayText(), "*.shp")
-                if newname != None:
-                	self.shapefilename.setText(newname)
+		newname = QFileDialog.getSaveFileName(None, "Output Shapefile", self.shapefilename.displayText(), "*.shp")
+		if newname != None:
+			self.shapefilename.setText(newname)
 	
 	# distinct function to cleanup city csv file
 	def distinct(self,list):	
@@ -187,8 +196,9 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 		if self.radio_list.isChecked():
 			# load cities
 			def get_col(filename, col=0):
-				dir = QFileInfo(core.QgsApplication.qgisUserDbFilePath()).path() + "/python/plugins/pdokbaggeocoder"
-				for row in csv.reader(open(dir + "/14-02-2013 WPL overzicht gemeenten.csv"), delimiter=';'):
+				#dir = QFileInfo(core.QgsApplication.qgisUserDbFilePath()).path() + "/python/plugins/pdokbaggeocoder"
+				dir = os.path.dirname(__file__)
+				for row in csv.reader(open(dir + "/14-02-2013 WPL overzicht gemeenten.csv", encoding="latin-1"), delimiter=';'):
 					if row != 0:
 						if row[col] is not '':
 							yield row[col]
@@ -229,11 +239,10 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 		start_time = time.time()
 		
 		# alert if no city is given
-		csvname = unicode(self.infilename.displayText()).strip()
-		shapefilename = unicode(self.shapefilename.displayText())
+		csvname = str(self.infilename.displayText()).strip()
+		shapefilename = str(self.shapefilename.displayText())
 		notfoundfile = self.notfoundfilename.displayText()
 		test = self.city.currentIndex()
-			
 		if test == 0:
 			QMessageBox.critical(self.iface.mainWindow(), "PDOK BAG Geocoder", "Geen Woonplaats kolom ingevuld!")
 			# use - instead of + for extension and letter additions in search sentence
@@ -244,13 +253,13 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 		else:
 			if self.radio_list.isChecked():
 				# separate field for single cityname
-				current_city=unicode(self.city.currentText())
-				fields = [unicode(self.address.currentText()).strip(), unicode(self.housenumber.currentText()).strip()]
+				current_city=str(self.city.currentText())
+				fields = [str(self.address.currentText()).strip(), str(self.housenumber.currentText()).strip()]
 		
 			if self.radio_column.isChecked():
 			# create address search line: address+housenumber-extension or letter+city	
 				current_city=""
-				fields = [unicode(self.address.currentText()).strip(), unicode(self.housenumber.currentText()).strip(),unicode(self.city.currentText()).strip()]
+				fields = [str(self.address.currentText()).strip(), str(self.housenumber.currentText()).strip(),str(self.city.currentText()).strip()]
 		
 			for x in range(0, len(fields)):
 				if fields[x] == "----":
@@ -258,5 +267,5 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
 	
 			# print csvname + "," + "," + shapefilename
 			message = pdokbaggeocoder(self.iface, csvname, shapefilename, notfoundfile, fields, 1, current_city, start_time)
-			if message <> None:
+			if message != None:
 				QMessageBox.critical(self.iface.mainWindow(), "Geocode BAG", message)	

@@ -26,15 +26,16 @@ import csv
 import sys
 import time
 import datetime
-import urllib
 import os.path
-import urllib2
+#import urllib2
+import urllib.request, urllib.parse, urllib.error
 import json
 import re
 #from re import sub
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtWidgets import QMessageBox
 from qgis.core import *
 from math import *
 import os
@@ -47,7 +48,7 @@ import os
 def pdokbaggeocoder_find_layer(layer_name):
     # print "find_layer(" + str(layer_name) + ")"
 
-    for name, search_layer in QgsMapLayerRegistry.instance().mapLayers().iteritems():
+    for name, search_layer in QgsProject.instance().mapLayers().iteritems():
         if search_layer.name() == layer_name:
             return search_layer
 
@@ -66,7 +67,7 @@ def format_float(value, separator, decimals):
     """
         Cumbersome function to give backward compatibility before python 2.7
     """
-    formatstring = ("%0." + unicode(int(decimals)) + "f")
+    formatstring = ("%0." + str(int(decimals)) + "f")
     # print str(value) + ": " + formatstring
     string = formatstring % value
     intend = string.find('.')
@@ -121,21 +122,21 @@ def pdokbaggeocoder_layer_attribute_bounds(layer, attribute_name):
 
 
 def pdokbaggeocoder_wkbtype_to_text(wkbtype):
-    if wkbtype == QGis.WKBUnknown: return "Unknown"
-    if wkbtype == QGis.WKBPoint: return "point"
-    if wkbtype == QGis.WKBLineString: return "linestring"
-    if wkbtype == QGis.WKBPolygon: return "polygon"
-    if wkbtype == QGis.WKBMultiPoint: return "multipoint"
-    if wkbtype == QGis.WKBMultiLineString: return "multilinestring"
-    if wkbtype == QGis.WKBMultiPolygon: return "multipolygon"
-    # if wkbtype == QGis.WKBNoGeometry: return "no geometry"
-    if wkbtype == QGis.WKBPoint25D: return "point 2.5d"
-    if wkbtype == QGis.WKBLineString25D: return "linestring 2.5D"
-    if wkbtype == QGis.WKBPolygon25D: return "multipolygon 2.5D"
-    if wkbtype == QGis.WKBMultiPoint25D: return "multipoint 2.5D"
-    if wkbtype == QGis.WKBMultiLineString25D: return "multilinestring 2.5D"
-    if wkbtype == QGis.WKBMultiPolygon25D: return "multipolygon 2.5D"
-    return "Unknown WKB " + unicode(wkbtype)
+    if wkbtype == QgsWkbTypes.Unknown: return "Unknown"
+    if wkbtype == QgsWkbTypes.Point: return "point"
+    if wkbtype == QgsWkbTypes.LineString: return "linestring"
+    if wkbtype == QgsWkbTypes.Polygon: return "polygon"
+    if wkbtype == QgsWkbTypes.MultiPoint: return "multipoint"
+    if wkbtype == QgsWkbTypes.MultiLineString: return "multilinestring"
+    if wkbtype == QgsWkbTypes.MultiPolygon: return "multipolygon"
+    # if wkbtype == QgsWkbTypes.NoGeometry: return "no geometry"
+    if wkbtype == QgsWkbTypes.Point25D: return "point 2.5d"
+    if wkbtype == QgsWkbTypes.LineString25D: return "linestring 2.5D"
+    if wkbtype == QgsWkbTypes.Polygon25D: return "multipolygon 2.5D"
+    if wkbtype == QgsWkbTypes.MultiPoint25D: return "multipoint 2.5D"
+    if wkbtype == QgsWkbTypes.MultiLineString25D: return "multilinestring 2.5D"
+    if wkbtype == QgsWkbTypes.MultiPolygon25D: return "multipolygon 2.5D"
+    return "Unknown WKB " + str(wkbtype)
 
 
 def pdokbaggeocoder_status_message(qgis, message):
@@ -165,14 +166,14 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
     indices = []
 
     if current_city != "":
-        selected_city = "+" + urllib.quote(current_city)
+        selected_city = "+" + urllib.parse.quote(current_city)
     else:
         selected_city = ""
 
     try:
         infile.seek(0)
         reader = csv.reader(infile, dialect)
-        header = reader.next()
+        header = reader.__next__()
     except:
         return "Fout bij het lezen van " + str(csvname) + ": " + str(sys.exc_info()[1])
 
@@ -203,7 +204,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
 
     crs = QgsCoordinateReferenceSystem()
     crs.createFromSrid(28992)
-    outfile = QgsVectorFileWriter(shapefilename, "System", fields, QGis.WKBPoint, crs)
+    outfile = QgsVectorFileWriter(shapefilename, "System", fields, QgsWkbTypes.Point, crs, 'ESRI Shapefile')
 
     if (outfile.hasError() != QgsVectorFileWriter.NoError):
         return "Schrijffout bij het aanmaken van de shapefile: " + str(outfile.errorMessage())
@@ -221,7 +222,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
             if x < len(row):
                 value = row[x].strip()
                 value = row[x].replace('-', ' ')
-                new_string = urllib.quote(value)
+                new_string = urllib.parse.quote(value)
 
                 if len(new_string) > 0:
                     if x != indices[0]:
@@ -236,7 +237,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
             url = '{}{}{}&rows=10&bq=type:adres'.format(url_geocoder,total_address, selected_city)
             url_list.append(url)
             try:
-                response = urllib2.urlopen(url).read()
+                response = urllib.request.urlopen(url).read()
                 results = json.loads(response)
                 if len(results["response"]["docs"]) > 0:
                     for result in results["response"]["docs"]:
@@ -250,7 +251,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
                                     attributes.append(row[z].strip())
                             newfeature = QgsFeature()
                             newfeature.setAttributes(attributes)
-                            geometry = QgsGeometry.fromPoint(QgsPoint(x, y))
+                            geometry = QgsGeometry.fromPointXY(QgsPointXY(x, y))
                             newfeature.setGeometry(geometry)
                             outfile.addFeature(newfeature)
                             break
@@ -259,7 +260,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
                     notwriter.writerow(row)
                     notfound_list.append(url)
             # website offline?
-            except urllib2.URLError as e:
+            except urllib.error.URLError as e:
                 end_time = time.time()
                 elapsed_time = round(end_time - start_time)
                 QMessageBox.critical(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", "Geocoderen mislukt na %s aantal en %s. \n%s \nError\n%s" % (str(recordcount),str(datetime.timedelta(seconds=elapsed_time)),str(url_list[-1]), str(e)))
@@ -279,7 +280,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
     else:
         tips=   "\n____________________________________________________________\n\nHieronder zijn de eerste paar gebruikte adressen te zien:\n"+'\n'.join(map(str, url_list[0:5]))+"\n..."
 
-    qgis.mainWindow().statusBar().showMessage(unicode(recordcount - notfoundcount) + " of " + unicode(recordcount)
+    qgis.mainWindow().statusBar().showMessage(str(recordcount - notfoundcount) + " of " + str(recordcount)
         + " addresses geocoded with PDOK BAG Geocoder")
     QMessageBox.information(qgis.mainWindow(), "Geocoderen met PDOK BAG Geocoder", "%s van %s adressen succesvol gegeocodeerd in %s (in EPSG:28992) \n%s" % ((str(recordcount - notfoundcount)),(str(recordcount)), str(datetime.timedelta(seconds=elapsed_time)),tips))
     return None

@@ -20,10 +20,11 @@
 #   Foundation (www.gnu.org).
 # --------------------------------------------------------
 
-from PyQt4.QtCore import *
-from PyQt4.QtGui import *
+from qgis.PyQt.QtCore import *
+from qgis.PyQt.QtGui import *
+from qgis.PyQt.QtWidgets import QAction
 from qgis.core import *
-from pdokbaggeocoder_dialogs import pdokbaggeocoder_dialog
+from .pdokbaggeocoder_dialogs import pdokbaggeocoder_dialog
 import os.path
 # ---------------------------------------------
 
@@ -47,7 +48,7 @@ class pdokbaggeocoder_menu:
 		# Remove the plugin menu item and icon
 		self.iface.removePluginMenu(u"&PDOK BAG Geocoder", self.action)
 		self.iface.removeToolBarIcon(self.action)
-		  
+
 	# run method that performs all the real work	
 	def run(self):
 		# show the dialog

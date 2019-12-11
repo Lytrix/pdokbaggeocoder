@@ -39,6 +39,7 @@ from qgis.PyQt.QtGui import *
 from qgis.PyQt.QtWidgets import QAction, QDialog, QFileDialog, QMessageBox
 from qgis.core import *
 from qgis import core
+from qgis.core import QgsMessageLog
 from .pdokbaggeocoder_library import *
 
 from .forms.pdokbaggeocoder_form import Ui_pdokbaggeocoder_form
@@ -82,9 +83,8 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
     def browse_infile_dialog(self):
         newname = QFileDialog.getOpenFileName(None, "Address CSV Input File", self.infilename.displayText(), "CSV File (*.csv *.txt)")
         # ?? QFileDialog.getOpenFileName returns a tuple in which the first item is the filename+path
-        if newname and newname[0]:
+        if isinstance(newname, tuple):
             newname = newname[0]
-        if newname:
             try:
                 infile = open(newname, encoding="latin-1")
                 dialect = csv.Sniffer().sniff(infile.readline(), [',', ';', ';', '|'])
@@ -177,6 +177,8 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
     def browse_shapefile_dialog(self):
         newname = QFileDialog.getSaveFileName(None, "Output Shapefile", self.shapefilename.displayText(), "*.shp")
         if newname != None:
+            if isinstance(newname, tuple):
+                newname = newname[0]
             self.shapefilename.setText(newname)
 
     # distinct function to cleanup city csv file

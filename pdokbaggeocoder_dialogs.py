@@ -172,6 +172,8 @@ class pdokbaggeocoder_dialog(QDialog, Ui_pdokbaggeocoder_form):
     def browse_notfound_dialog(self):
         newname = QFileDialog.getSaveFileName(None, "Not Found List Output File",  self.notfoundfilename.displayText(), "CSV File (*.csv *.txt)")
         if newname != None:
+            if isinstance(newname, tuple):
+                newname = newname[0]
             self.notfoundfilename.setText(newname)
 
     def browse_shapefile_dialog(self):

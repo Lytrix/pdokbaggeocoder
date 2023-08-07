@@ -233,7 +233,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
             notfoundcount += 1
             notwriter.writerow(row)
         else:
-            url_geocoder = 'http://geodata.nationaalgeoregister.nl/locatieserver/free?q='
+            url_geocoder = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q='
             url = '{}{}{}&rows=10&bq=type:adres'.format(url_geocoder,total_address, selected_city)
             url_list.append(url)
             try:

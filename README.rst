@@ -31,7 +31,7 @@ MMQGIS Geocode CSV with Google plugin created by Michael Minn.
 Go to http://plugins.qgis.org/plugins/mmqgis/ for more information.
 	
 The geocoding is provided by the www.pdok.nl geocoding webservice:
-Go to https://www.pdok.nl/nl/producten/pdok-locatieserver for more information.
+Go to https://api.pdok.nl/bzk/locatieserver/search/v3_1/ui/ for more information.
 
 The csv file of cities list cities who are participating with the BAG transition. Go to http://www.kadaster.nl/web/Themas/themaartikel/BAGartikel/BAG-woonplaatscodetabel.htm for the source file.
 

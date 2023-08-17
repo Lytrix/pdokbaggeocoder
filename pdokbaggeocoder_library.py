@@ -10,7 +10,7 @@
 #   Go to http://plugins.qgis.org/plugins/mmqgis/ for more information.
 #
 #   The geocoding is provided by the www.pdok.nl geocoding webservice:
-#   Go to https://github.com/PDOK/locatieserver/wiki/API-Locatieserver
+#   Go to https://api.pdok.nl/bzk/locatieserver/search/v3_1/ui/
 #   for more information.
 #
 #   The BAG geocoder is free software and is offered without guarantee
@@ -233,7 +233,7 @@ def pdokbaggeocoder(qgis, csvname, shapefilename, notfoundfile, keys, addlayer, 
             notfoundcount += 1
             notwriter.writerow(row)
         else:
-            url_geocoder = 'http://geodata.nationaalgeoregister.nl/locatieserver/free?q='
+            url_geocoder = 'https://api.pdok.nl/bzk/locatieserver/search/v3_1/free?q='
             url = '{}{}{}&rows=10&bq=type:adres'.format(url_geocoder,total_address, selected_city)
             url_list.append(url)
             try:

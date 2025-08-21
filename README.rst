@@ -11,6 +11,8 @@ PDOK BAG geocoder is a QGIS v3 plugin for finding Dutch XY coordinates from a CS
 
 For QGIS v2 versions, use the `qgis2 branch <https://github.com/Lytrix/pdokbaggeocoder/tree/qgis2branch>`_.
 
+From QGIS v4 onwards this plugin will not work any more. Please use the [PDOK Services Plugin](https://github.com/opengeogroep/pdokservicesplugin) for similar type of functionality.
+
 Usage
 =====
 The PDOK BAG geocoder is designed to add xy coordinates to a simple table of  address with your own attributes. The National Dutch address dataset will be used called the BAG. 
